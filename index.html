@@ -25,42 +25,190 @@
             }
         }
     </script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
 
     <!-- 
-      INSTRUCCIONES DE DESPLIEGUE Y EMPAQUETADO (APK):
-
-      1. GitHub Pages:
-         - Sube estos archivos a un repositorio de GitHub.
-         - Ve a Settings > Pages.
-         - Selecciona la rama (main/master) y guarda.
-         - Tu PWA estará disponible en la URL proporcionada.
-
-      2. Generar APK (Android) con PWABuilder:
-         - Despliega tu web primero (ej. GitHub Pages).
-         - Ve a https://www.pwabuilder.com/.
-         - Ingresa la URL de tu sitio.
-         - PWABuilder evaluará tu manifest.json y service-worker.js.
-         - Haz clic en "Package for Store" -> Android.
-         - Descarga el archivo .apk o .aab firmado.
-
-      3. Cordova / Capacitor (Alternativa Local):
-         - Instala Cordova/Capacitor.
-         - Crea un proyecto nuevo.
-         - Copia el contenido de 'dist' (o estos archivos) a la carpeta 'www'.
-         - Ejecuta `cordova build android`.
+      === INSTRUCCIONES DE DESPLIEGUE ===
+      1. Sube index.html, styles.css, app.js, manifest.json y sw.js a GitHub.
+      2. Activa GitHub Pages en Settings.
     -->
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
     "react": "https://aistudiocdn.com/react@^19.2.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/"
   }
 }
 </script>
 </head>
-<body class="bg-gray-100 text-gray-900 antialiased">
-    <div id="root"></div>
+<body class="bg-gradient-to-br from-slate-100 to-indigo-50 min-h-screen text-gray-900 antialiased flex flex-col items-center justify-center p-4 sm:p-6">
+
+    <!-- App Container -->
+    <div id="app" class="w-full max-w-md flex flex-col items-center">
+        
+        <!-- Header -->
+        <header class="w-full flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-primary">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    Calculadora
+                </h1>
+                <p class="text-sm text-gray-500">Define tu precio de venta óptimo</p>
+            </div>
+            <button id="btn-info" type="button" class="p-2 text-gray-500 hover:text-primary transition-colors rounded-full hover:bg-white/50" aria-label="Información">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
+            </button>
+        </header>
+
+        <!-- Main Card -->
+        <main class="w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <div class="p-6 sm:p-8 space-y-6">
+                
+                <!-- IMPORTANTE: onsubmit="event.preventDefault()" evita que la página se recargue -->
+                <form id="calc-form" class="space-y-5" onsubmit="event.preventDefault()">
+                    <!-- Cost Input -->
+                    <div>
+                        <label for="cost" class="block text-sm font-medium text-gray-700 mb-1">
+                            Costo del Producto ($)
+                        </label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="text-gray-500 sm:text-lg">$</span>
+                            </div>
+                            <input
+                                type="number"
+                                id="cost"
+                                step="0.01"
+                                class="block w-full rounded-lg border-gray-300 pl-8 pr-12 py-3 focus:border-primary focus:ring-primary sm:text-lg bg-gray-50 focus:bg-white transition-all border outline-none ring-0 focus:ring-2"
+                                placeholder="0.00"
+                                required
+                                inputmode="decimal"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Margin Input -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="margin" class="block text-sm font-medium text-gray-700">
+                                Margen de Ganancia (%)
+                            </label>
+                            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                                Predeterminado: 48%
+                            </span>
+                        </div>
+                        <div class="relative rounded-md shadow-sm">
+                            <input
+                                type="number"
+                                id="margin"
+                                class="block w-full rounded-lg border-gray-300 py-3 px-4 focus:border-primary focus:ring-primary sm:text-lg bg-gray-50 focus:bg-white transition-all border outline-none ring-0 focus:ring-2"
+                                placeholder="48"
+                                value="48"
+                                inputmode="decimal"
+                            />
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                <span class="text-gray-500 font-bold">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="error-msg" class="hidden p-3 rounded-lg bg-red-50 text-red-600 text-sm flex items-center gap-2 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
+                        </svg>
+                        <span id="error-text"></span>
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <button
+                        type="submit"
+                        id="btn-calculate"
+                        class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-lg font-semibold text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 active:transform active:scale-95"
+                    >
+                        Calcular Precio
+                    </button>
+                </form>
+
+                <!-- Results Section -->
+                <div id="result-section" class="hidden transition-all duration-500 ease-in-out">
+                    <div class="relative mt-2 pt-6 border-t border-dashed border-gray-200">
+                        <p class="text-center text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Precio de Venta Sugerido</p>
+                        <div class="text-center">
+                            <span id="selling-price" class="block text-4xl sm:text-5xl font-extrabold text-secondary tracking-tight">
+                                $ 0.00
+                            </span>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <span class="block text-xs text-gray-500">Ganancia Neta</span>
+                                <span id="profit-amount" class="block text-sm font-bold text-gray-700">$ 0.00</span>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded-lg">
+                                <span class="block text-xs text-gray-500">Costo Base</span>
+                                <span id="base-cost" class="block text-sm font-bold text-gray-700">$ 0.00</span>
+                            </div>
+                        </div>
+                        
+                        <button id="btn-reset" type="button" class="mt-6 w-full text-sm text-gray-400 hover:text-gray-600 underline decoration-gray-300 underline-offset-4">
+                            Limpiar Calculadora
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="mt-8 text-center text-xs text-gray-400">
+            <p>&copy; <span id="year"></span> Calculadora Comercial</p>
+            <p class="mt-1">Optimizado para Móvil y PWA</p>
+        </footer>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 relative animate-fade-in" id="modal-content">
+            <button id="btn-close-modal" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Acerca de la Fórmula</h2>
+            
+            <div class="space-y-4 text-sm text-gray-600">
+                <p>Esta aplicación calcula el precio de venta necesario para obtener un margen de ganancia real sobre el precio final.</p>
+                
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <p class="font-mono text-xs text-blue-800 font-bold mb-1">Fórmula utilizada:</p>
+                    <p class="font-mono text-blue-900">Precio = Costo / (1 - Margen)</p>
+                </div>
+
+                <p>
+                    <strong>Ejemplo:</strong><br/>
+                    Costo: $100<br/>
+                    Margen: 48% (0.48)<br/>
+                    Cálculo: 100 / (1 - 0.48) = 100 / 0.52<br/>
+                    <strong>Resultado: $192.31</strong>
+                </p>
+            </div>
+            
+            <button id="btn-close-modal-action" type="button" class="mt-6 w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- Logic Script -->
+    <script src="app.js"></script>
     
     <!-- Service Worker Registration -->
     <script>
@@ -68,14 +216,15 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then((registration) => {
-                        console.log('Service Worker registrado con éxito:', registration.scope);
+                        console.log('SW registrado. Scope:', registration.scope);
+                        // Intentar actualizar si hay una nueva versión
+                        registration.update();
                     })
-                    .catch((error) => {
-                        console.log('Fallo al registrar Service Worker:', error);
+                    .catch((err) => {
+                        console.log('Error SW:', err);
                     });
             });
         }
     </script>
-    <script type="module" src="./index.tsx"></script>
 </body>
 </html>

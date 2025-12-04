@@ -1,16 +1,21 @@
-const CACHE_NAME = 'calc-precio-v1';
+const CACHE_NAME = 'calc-precio-v3-fix';
 const urlsToCache = [
   './',
   './index.html',
+  './styles.css',
+  './app.js',
   './manifest.json',
   'https://cdn.tailwindcss.com'
 ];
 
 self.addEventListener('install', (event) => {
+  // Forzar al SW a activarse inmediatamente
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log('Abriendo caché v3');
         return cache.addAll(urlsToCache);
       })
   );
@@ -31,15 +36,20 @@ self.addEventListener('fetch', (event) => {
 
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
+  // Reclamar clientes inmediatamente para controlar la página sin recargar
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheWhitelist.indexOf(cacheName) === -1) {
+              console.log('Eliminando caché antigua:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    ])
   );
 });
