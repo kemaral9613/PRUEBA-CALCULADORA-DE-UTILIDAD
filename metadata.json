@@ -1,0 +1,5 @@
+{
+  "name": "Calculadora de Precios PWA",
+  "description": "Una aplicación web progresiva para calcular precios de venta basados en costos y márgenes de ganancia.",
+  "requestFramePermissions": []
+}

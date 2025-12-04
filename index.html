@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Precios</title>
+    <meta name="description" content="Calcula el precio de venta ideal basado en tus costos y margen de ganancia.">
+    <meta name="theme-color" content="#4f46e5">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://picsum.photos/192/192">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 
+      INSTRUCCIONES DE DESPLIEGUE Y EMPAQUETADO (APK):
+
+      1. GitHub Pages:
+         - Sube estos archivos a un repositorio de GitHub.
+         - Ve a Settings > Pages.
+         - Selecciona la rama (main/master) y guarda.
+         - Tu PWA estará disponible en la URL proporcionada.
+
+      2. Generar APK (Android) con PWABuilder:
+         - Despliega tu web primero (ej. GitHub Pages).
+         - Ve a https://www.pwabuilder.com/.
+         - Ingresa la URL de tu sitio.
+         - PWABuilder evaluará tu manifest.json y service-worker.js.
+         - Haz clic en "Package for Store" -> Android.
+         - Descarga el archivo .apk o .aab firmado.
+
+      3. Cordova / Capacitor (Alternativa Local):
+         - Instala Cordova/Capacitor.
+         - Crea un proyecto nuevo.
+         - Copia el contenido de 'dist' (o estos archivos) a la carpeta 'www'.
+         - Ejecuta `cordova build android`.
+    -->
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+  }
+}
+</script>
+</head>
+<body class="bg-gray-100 text-gray-900 antialiased">
+    <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Fallo al registrar Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+    <script type="module" src="./index.tsx"></script>
+</body>
+</html>
